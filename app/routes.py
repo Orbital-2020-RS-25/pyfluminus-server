@@ -3,8 +3,11 @@ from pyfluminus.api import name, modules, get_announcements
 from pyfluminus.structs import Module
 from flask import Flask, request, jsonify
 import sys
+from app import app
 
-app = Flask(__name__)
+@app.route('/')
+def index():
+    return 'Main page'
 
 # a simple page that says hello
 @app.route('/hello')
