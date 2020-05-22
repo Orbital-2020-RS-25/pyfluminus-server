@@ -19,7 +19,7 @@ def hello():
 @app.route('/login', methods=['POST'])
 def login():
     login_info = request.get_json()
-    auth = vafs_jwt("nusstu\\" + login_info['userName'], login_info['password'])
+    auth = vafs_jwt("nusstu\\e" + login_info['userName'], login_info['password'])
     if User.query.get(login_info['userName']) == None: 
         uName = name(auth).data
         u = User(name = uName, nus_net_id = login_info['userName'])
@@ -41,11 +41,12 @@ def userName():
 def active_mods():
     auth = request.get_json()
     return util.get_active_mods(auth)
-    
-@app.route('/annoucementsAll', methods = ['POST'])
+
+
+@app.route('/announcementsAll', methods = ['POST'])
 def announcements():
     auth = request.get_json()
-    return util.get_all_annoucements
+    return util.get_all_announcement
 
 @app.route('/profile/<nusNetId>')
 def profile(nusNetId):

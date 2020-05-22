@@ -2,6 +2,12 @@
 
 Flask server to call APIs from [pyfluminus](https://github.com/raynoldng/pyfluminus). 
 
+To create database locally: 
+```
+flask db migrate
+flask db upgrade
+```
+
 To start locally: 
 ```
 export FLASK_APP=server.py
