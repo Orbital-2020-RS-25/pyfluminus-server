@@ -4,7 +4,7 @@ Flask server to call APIs from [pyfluminus](https://github.com/raynoldng/pyflumi
 
 To start locally: 
 ```
-export FLASK_APP=app.py
+export FLASK_APP=server.py
 export FLASK_ENV=development
 * to run in debug mode
 flask run

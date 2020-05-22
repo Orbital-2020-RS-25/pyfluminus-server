@@ -3,7 +3,8 @@ from pyfluminus.api import name, modules, get_announcements
 from pyfluminus.structs import Module
 from flask import Flask, request, jsonify
 import sys
-from app import app
+from app import app, db, util
+from app.models import User, User_Mods
 
 @app.route('/')
 def index():
@@ -18,8 +19,18 @@ def hello():
 @app.route('/login', methods=['POST'])
 def login():
     login_info = request.get_json()
-    print(login_info, file=sys.stderr)
-    return vafs_jwt(login_info['userName'], login_info['password'])
+    auth = vafs_jwt("nusstu\\" + login_info['userName'], login_info['password'])
+    if User.query.get(login_info['userName']) == None: 
+        uName = name(auth).data
+        u = User(name = uName, nus_net_id = login_info['userName'])
+        mods = util.get_active_mods(auth)
+        for key in mods: 
+            m = User_Mods(code=key, mod_id=mods[key]["id"], name=mods[key]["name"], term=mods[key]["term"], student=login_info['userName'])
+            db.session.add(m)
+            db.session.commit()
+        db.session.add(u)
+        db.session.commit()
+    return auth
 
 @app.route('/name', methods=['POST'])
 def userName(): 
@@ -29,17 +40,21 @@ def userName():
 @app.route('/activeModules', methods=['POST'])
 def active_mods():
     auth = request.get_json()
-    mods = modules(auth).data
-    mods_dict = {}
-    for mod in mods:
-        mods_dict[mod.code] = {"name" : mod.name, "id" : mod.id}
-    return mods_dict
+    return util.get_active_mods(auth)
     
 @app.route('/annoucementsAll', methods = ['POST'])
 def announcements():
     auth = request.get_json()
-    mods = modules(auth).data
-    announcements_list = {}
+    return util.get_all_annoucements
+
+@app.route('/profile/<nusNetId>')
+def profile(nusNetId):
+    user = User.query.get(nusNetId)
+    mods = User_Mods.query.filter_by(student=nusNetId).all()
+    mod_info = {}
     for mod in mods:
-        announcements_list[mod.code] = get_announcements(auth, mod.id, False).data
-    return announcements_list
+        mod_info[mod.code] = {"id" : mod.mod_id,
+                              "name" : mod.name,
+                              "term" : mod.term}
+    return {"name" : user.name, 
+            "mods" : mod_info}
