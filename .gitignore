@@ -3,7 +3,7 @@ env
 venv
 .vscode
 __pycache__
-app.db
+/app.db
 # Elastic Beanstalk Files
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
