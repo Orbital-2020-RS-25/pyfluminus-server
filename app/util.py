@@ -41,3 +41,24 @@ def get_current_term(auth):
     :rtype: dict
     """
     return current_term(auth).data
+
+def response_json(status, count, data): 
+    """Generates JSON for http responses
+
+    :param status: True if data is valid and there are no errors, False otherwise
+    :type valid: boolean
+    :param code: http response code
+    :type code: int
+    :param count: Total number of fields in data
+    :type count: int
+    :param data: json structure for the actual data
+    :type data: dict
+    :return: Dictionary comprising of all the params to be sent to client as JSON
+    :rtype: dict
+    """
+    return {
+        "status" : status, 
+        #"code"  : code, 
+        "count" : count,
+        "data"  : data
+    }
