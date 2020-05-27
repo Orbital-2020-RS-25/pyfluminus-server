@@ -14,7 +14,7 @@ class User(db.Model):
     name = db.Column(db.String(64), index=True, unique=False)
     #NUSNET ID, the EXXXXXXX number
     nus_net_id = db.Column(db.String(8), index=True, unique=True, primary_key=True)
-    #mods = db.relationship('User_Mods', backref='student_taking', lazy='dynamic')
+    mods = db.relationship('User_Mods', backref='student_taking', lazy='dynamic')
 
     def __repr__(self):
         return "<User {}>".format(self.name)
