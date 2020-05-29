@@ -14,7 +14,7 @@ class User(db.Model):
     #name of user, not unique as people may have same names
     name = db.Column(db.String(64), index=True, unique=False)
     #NUSNET ID, the EXXXXXXX number
-    nus_net_id = db.Column(db.String, index=True, unique=True, primary_key=True)
+    nus_net_id = db.Column(db.String, index=True, unique=True)
     mods = db.relationship('User_Mods', backref='student_taking')
 
     def __repr__(self):
