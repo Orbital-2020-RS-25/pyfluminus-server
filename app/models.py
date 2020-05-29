@@ -50,7 +50,6 @@ class User_Mods(db.Model):
     class_grp = db.Column(db.String(6), index=True, unique=False, default="T0")
     term = db.Column(db.String(6), index=True, unique=False)
     student = db.Column(db.String, db.ForeignKey('users.nus_net_id'))
-    student_taking = db.relationship('users')
 
     def __repr__(self):
         return "<Mod {} taken by {}>".format(self.code, self.student)
