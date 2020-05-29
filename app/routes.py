@@ -27,9 +27,11 @@ def hello():
 def login():
     login_info = request.get_json()
     auth = vafs_jwt("nusstu\\" + login_info['userName'], login_info['password'])
-    user_id = int(login_info['userName'].split('e')[1])
     if "error" in auth:
         return util.response_json(False, 1, auth), HTTP_UNAUTHORISED
+        
+    user_id = int(login_info['userName'].split('e')[1])
+
     if User.query.get(user_id) == None: 
         uName = name(auth).data
         u = User(name = uName, nus_net_id = user_id)
