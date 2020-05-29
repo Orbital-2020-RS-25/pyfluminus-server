@@ -27,14 +27,15 @@ def hello():
 def login():
     login_info = request.get_json()
     auth = vafs_jwt("nusstu\\" + login_info['userName'], login_info['password'])
+    user_id = int(login_info['userName'].split('e')[1])
     if "error" in auth:
         return util.response_json(False, 1, auth), HTTP_UNAUTHORISED
-    if User.query.get(login_info['userName']) == None: 
+    if User.query.get(user_id) == None: 
         uName = name(auth).data
-        u = User(name = uName, nus_net_id = login_info['userName'])
+        u = User(name = uName, nus_net_id = user_id)
         mods = util.get_active_mods(auth)
         for key in mods: 
-            m = User_Mods(code=key, mod_id=mods[key]["id"], name=mods[key]["name"], term=mods[key]["term"], student=login_info['userName'])
+            m = User_Mods(code=key, mod_id=mods[key]["id"], name=mods[key]["name"], term=mods[key]["term"], student=user_id)
             db.session.add(m)
             db.session.commit()
         db.session.add(u)
@@ -68,6 +69,7 @@ def announcements():
 @app.route('/profile/<nusNetId>')
 def profile(nusNetId):
     try: 
+        nusNetId = int(nusNetId.split('e')[1])
         user = User.query.get(nusNetId)
         mods = User_Mods.query.filter_by(student=nusNetId).all()
         mod_info = {}
