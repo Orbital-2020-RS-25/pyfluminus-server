@@ -8,7 +8,7 @@ class User(db.Model):
     :param nus_net_id: NUSnet ID of the student, the EXXXXXXX number
     :type nus_net_id: String, maximum size 8
     """
-    __tablename__ = 'users'
+    __tablename__ = 'user'
 
     #database id
     id = db.Column(db.Integer)
