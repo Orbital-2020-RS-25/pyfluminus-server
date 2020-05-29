@@ -1,6 +1,6 @@
 from flask import Flask
 from config import Config
-from flask_sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy, Column, Integer, String, ForeignKey
 from flask_migrate import Migrate
 
 app = Flask(__name__)

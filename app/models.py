@@ -10,12 +10,12 @@ class User(db.Model):
     """
 
     #database id
-    id = db.Column(db.Integer)
+    id = db.Column(db.Integer, primary_key=True)
     #name of user, not unique as people may have same names
     name = db.Column(db.String(64), index=True, unique=False)
     #NUSNET ID, the EXXXXXXX number
     nus_net_id = db.Column(db.String, index=True, unique=True, primary_key=True)
-    mods = db.relationship('user_mods', backref='student_taking')
+    mods = db.relationship('User_Mods', backref='student_taking')
 
     def __repr__(self):
         return "<User {}, {}, {}>".format(self.name, self.nus_net_id, self.id)
@@ -43,7 +43,7 @@ class User_Mods(db.Model):
     name = db.Column(db.String(30))
     class_grp = db.Column(db.String(6), index=True, unique=False, default="T0")
     term = db.Column(db.String(6), index=True, unique=False)
-    student = db.Column(db.String, db.ForeignKey('user.nus_net_id'))
+    student = db.Column(db.Integer, db.ForeignKey('User.id'))
 
     def __repr__(self):
         return "<Mod {} taken by {}>".format(self.code, self.student)

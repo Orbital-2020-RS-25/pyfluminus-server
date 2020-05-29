@@ -32,13 +32,13 @@ def login():
         
     user_id = login_info['userName']
 
-    if User.query.get(user_id) == None: 
+    if User.query.filter_by(nus_net_id=user_id) == None: 
         uName = name(auth).data
         u = User(name = uName, nus_net_id = user_id)
         mods = util.get_active_mods(auth)
-        #uId = User.query.filter(User.nus_net_id ==  user_id).first().id
+        uId = User.query.filter(User.nus_net_id == user_id).first().id
         for key in mods: 
-            m = User_Mods(code=key, mod_id=mods[key]["id"], name=mods[key]["name"], term=mods[key]["term"], student=user_id)
+            m = User_Mods(code=key, mod_id=mods[key]["id"], name=mods[key]["name"], term=mods[key]["term"], student=uId)
             db.session.add(m)
             db.session.commit()
         db.session.add(u)
@@ -73,7 +73,8 @@ def announcements():
 def profile(nusNetId):
     try: 
         user = User.query.get(nusNetId)
-        mods = User_Mods.query.filter_by(student=nusNetId).all()
+        uId = User.query.filter(User.nus_net_id == user_id).first().id
+        mods = User_Mods.query.filter_by(student=uId).all()
         mod_info = {}
         for mod in mods:
             mod_info[mod.code] = {"id" : mod.mod_id,
