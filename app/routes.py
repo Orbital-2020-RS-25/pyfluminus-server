@@ -30,18 +30,19 @@ def login():
     if "error" in auth:
         return util.response_json(False, 1, auth), HTTP_UNAUTHORISED
         
-    user_id = int(login_info['userName'].split('e')[1])
+    user_id = login_info['userName']
 
-    if User.query.get(user_id) == None: 
+    if User.query.filter(User.nus_net_id == user_id).first() == None: 
         uName = name(auth).data
         u = User(name = uName, nus_net_id = user_id)
         mods = util.get_active_mods(auth)
-        for key in mods: 
-            m = User_Mods(code=key, mod_id=mods[key]["id"], name=mods[key]["name"], term=mods[key]["term"], student=user_id)
-            db.session.add(m)
-            db.session.commit()
         db.session.add(u)
         db.session.commit()
+        uId = User.query.filter(User.nus_net_id ==  user_id).first().id
+        for key in mods: 
+            m = User_Mods(code=key, mod_id=mods[key]["id"], name=mods[key]["name"], term=mods[key]["term"], student=uId)
+            db.session.add(m)
+            db.session.commit()
     return util.response_json(True, 1, auth), HTTP_OK
 
 @app.route('/name', methods=['POST'])
@@ -71,9 +72,9 @@ def announcements():
 @app.route('/profile/<nusNetId>')
 def profile(nusNetId):
     try: 
-        nusNetId = int(nusNetId.split('e')[1])
-        user = User.query.get(nusNetId)
-        mods = User_Mods.query.filter_by(student=nusNetId).all()
+        user = User.query.filter(User.nus_net_id == nusNetId).first()
+        uID = user.id
+        mods = User_Mods.query.filter_by(student=uID).all()
         mod_info = {}
         for mod in mods:
             mod_info[mod.code] = {"id" : mod.mod_id,
