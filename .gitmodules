@@ -1,3 +1,0 @@
-[submodule "lib/pyfluminus"]
-	path = lib/pyfluminus
-	url = https://github.com/raynoldng/pyfluminus.git
