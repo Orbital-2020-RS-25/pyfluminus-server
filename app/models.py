@@ -8,7 +8,7 @@ class User(db.Model):
     :param nus_net_id: NUSnet ID of the student, the EXXXXXXX number
     :type nus_net_id: String, maximum size 8
     """
-
+    __tablename__ = 'users'
     #database id
     id = db.Column(db.Integer, primary_key=True)
     #name of user, not unique as people may have same names
@@ -37,13 +37,14 @@ class User_Mods(db.Model):
     :type student: String, maximum size 8
 
     """
+    __tablename__ = 'user_mods'
     id = db.Column(db.Integer, index=True, primary_key=True)
     code = db.Column(db.String(8), index=True, unique=False)
     mod_id = db.Column(db.String(64), index=True, unique=False)
     name = db.Column(db.String(30))
     class_grp = db.Column(db.String(6), index=True, unique=False, default="T0")
     term = db.Column(db.String(6), index=True, unique=False)
-    student = db.Column(db.Integer, db.ForeignKey('user.id'))
+    student = db.Column(db.Integer, db.ForeignKey('users.id'))
 
     def __repr__(self):
         return "<Mod {} taken by {}>".format(self.code, self.student)
