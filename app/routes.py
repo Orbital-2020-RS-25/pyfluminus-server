@@ -32,17 +32,18 @@ def login():
         
     user_id = login_info['userName']
 
-    if User.query.filter_by(nus_net_id=user_id) == None: 
+    if User.query.filter_by(nus_net_id=user_id).first() == None: 
         uName = name(auth).data
         u = User(name = uName, nus_net_id = user_id)
         mods = util.get_active_mods(auth)
+        db.session.add(u)
+        db.session.commit()
         uId = User.query.filter(User.nus_net_id == user_id).first().id
         for key in mods: 
             m = User_Mods(code=key, mod_id=mods[key]["id"], name=mods[key]["name"], term=mods[key]["term"], student=uId)
             db.session.add(m)
             db.session.commit()
-        db.session.add(u)
-        db.session.commit()
+
     return util.response_json(True, 1, auth), HTTP_OK
 
 @app.route('/name', methods=['POST'])
@@ -72,8 +73,8 @@ def announcements():
 @app.route('/profile/<nusNetId>')
 def profile(nusNetId):
     try: 
-        user = User.query.get(nusNetId)
-        uId = User.query.filter(User.nus_net_id == user_id).first().id
+        user = User.query.filter_by(nus_net_id=nusNetId).first()
+        uId = user.id
         mods = User_Mods.query.filter_by(student=uId).all()
         mod_info = {}
         for mod in mods:
