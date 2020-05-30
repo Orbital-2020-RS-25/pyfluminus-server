@@ -41,7 +41,7 @@ class User_Mods(db.Model):
     id = db.Column(db.Integer, index=True, primary_key=True)
     code = db.Column(db.String(8), index=True, unique=False)
     mod_id = db.Column(db.String(64), index=True, unique=False)
-    name = db.Column(db.String(30))
+    name = db.Column(db.String)
     class_grp = db.Column(db.String(6), index=True, unique=False, default="T0")
     term = db.Column(db.String(6), index=True, unique=False)
     student = db.Column(db.Integer, db.ForeignKey('users.id'))
