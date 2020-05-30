@@ -38,7 +38,7 @@ def login():
         mods = util.get_active_mods(auth)
         db.session.add(u)
         db.session.commit()
-        uId = User.query.filter(User.nus_net_id == user_id).first().id
+        uId = User.query.filter_by(nus_net_id=user_id).first().id
         for key in mods: 
             m = User_Mods(code=key, mod_id=mods[key]["id"], name=mods[key]["name"], term=mods[key]["term"], student=uId)
             db.session.add(m)
