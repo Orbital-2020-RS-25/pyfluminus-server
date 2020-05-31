@@ -5,6 +5,7 @@ from flask import Flask, request, jsonify
 import sys
 from app import app, db, util
 from app.models import User, User_Mods
+from app.extra_api import get_class_grps
 
 #TODO add get class grps api with https://luminus.azure-api.net/user/Resource/{ResourceID}/Group[?sortby][&offset][&limit][&where]
 HTTP_OK = 200
@@ -40,7 +41,9 @@ def login():
         db.session.commit()
         uId = User.query.filter_by(nus_net_id=user_id).first().id
         for key in mods: 
-            m = User_Mods(code=key, mod_id=mods[key]["id"], name=mods[key]["name"], term=mods[key]["term"], student=uId)
+            mod_id = mods[key]["id"]
+            class_grp = get_class_grps(auth, mod_id)
+            m = User_Mods(code=key, mod_id=mod_id, name=mods[key]["name"], class_grp=class_grp, term=mods[key]["term"], student=uId)
             db.session.add(m)
             db.session.commit()
 
@@ -80,7 +83,8 @@ def profile(nusNetId):
         for mod in mods:
             mod_info[mod.code] = {"id" : mod.mod_id,
                                 "name" : mod.name,
-                                "term" : mod.term}
+                                "term" : mod.term, 
+                                "class_grps" : mod.class_grp}
         return {"name" : user.name, 
                 "mods" : mod_info}
     except: 
