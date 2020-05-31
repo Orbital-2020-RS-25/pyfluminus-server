@@ -1,13 +1,12 @@
 from pyfluminus.authorization import vafs_jwt
 from pyfluminus.api import name, modules, get_announcements
 from pyfluminus.structs import Module
-from flask import Flask, request, jsonify, redirect, url_for
+from flask import Flask, request, jsonify, redirect, url_for, render_template
 import sys
 from app import app, db, util
 from app.models import User, User_Mods
 from app.extra_api import get_class_grps
 
-#TODO add get class grps api with https://luminus.azure-api.net/user/Resource/{ResourceID}/Group[?sortby][&offset][&limit][&where]
 HTTP_OK = 200
 HTTP_NO_CONTENT = 204
 HTTP_BAD_REQUEST = 400
@@ -83,7 +82,8 @@ def updateProfile():
 def active_mods():
     try: 
         auth = request.get_json()
-        return util.get_active_mods(auth)
+        mods = util.get_active_mods(auth)
+        return util.response_json(True, len(mods), mods), HTTP_OK
     except: 
         return util.response_json(False, 1, {"error" : "Invalid"}), HTTP_NOT_FOUND
 
@@ -91,7 +91,8 @@ def active_mods():
 def announcements():
     try:
         auth = request.get_json()
-        return util.get_all_announcement
+        msgs = util.get_all_announcement(auth)
+        return util.response_json(True, len(msgs), msgs), HTTP_OK
     except: 
         return util.response_json(False, 1, {"error" : "Invalid"}), HTTP_NOT_FOUND
 
@@ -107,7 +108,7 @@ def profile(nusNetId):
                                 "name" : mod.name,
                                 "term" : mod.term, 
                                 "class_grps" : mod.class_grp}
-        return {"name" : user.name, 
-                "mods" : mod_info}
+        return util.response_json(True, len(mods), {"name" : user.name, 
+                "mods" : mod_info}), HTTP_OK
     except: 
         return util.response_json(False, 1, {"error" : "Not found"}), HTTP_NOT_FOUND

@@ -1,0 +1,374 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "# API documentations for Pyfluminus Server. \nFor faster access and future implementation of other features, the following data will be stored on the database: \n* Name\n* NUS Net ID\n* Information on the modules taken: \n  * Module code\n  * Class groups\n  * Module name\n  * Path to download files (Planned)\n  * Path to download web lectures (Planned)\n  * Announcements (Planned)\n  * Timetable (Planned)\n\nPasswords and authentication tokens __will not__ be stored. \n",
+    "version": "v41",
+    "title": "Another Luminus",
+    "license": {
+      "name": "MIT License"
+    }
+  },
+  "host": "another-luminus.herokuapp.com",
+  "schemes": [
+    "https"
+  ],
+  "paths": {
+    "/login": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Logs user in. ",
+        "description": "End point for logging user in. Posts user id and password to Luminus, then returns authentication token issued by Luminus. Updates database if users is not found. ",
+        "operationId": "login",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "User credentials",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Login"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation. ",
+            "schema": {
+              "$ref": "#/definitions/Auth"
+            }
+          },
+          "405": {
+            "description": "Invalid input. "
+          }
+        }
+      }
+    },
+    "/profile/{nusNetId}": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Gets list of modules taken by user. ",
+        "description": "End point for getting list of modules taken by user. ",
+        "operationId": "profile",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "nusNetId",
+            "in": "path",
+            "description": "NUSNET id of user. ",
+            "required": true,
+            "type": "string",
+            "items": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation. ",
+            "schema": {
+              "$ref": "#/definitions/Profile"
+            }
+          },
+          "405": {
+            "description": "Invalid input. "
+          }
+        }
+      }
+    },
+    "/updateProfile": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Updates name and module data",
+        "description": "Posts login information to Luminus and updates module information stored in database. If no module data exist on database, get data from Luminus and store them in the database. If module data exist, delete old data and create new entries with data from Luminus. __Redirects to profile__. ",
+        "operationId": "updateProfile",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "User credentials",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Login"
+            }
+          }
+        ],
+        "responses": {
+          "302": {
+            "description": "Successful operation, auto redirected to profile, returning with code 200 at profile. ",
+            "schema": {
+              "$ref": "#/definitions/Profile"
+            }
+          },
+          "401": {
+            "description": "Wrong credentials. "
+          }
+        }
+      }
+    },
+    "/activeModules": {
+      "post": {
+        "tags": [
+          "Modules"
+        ],
+        "summary": "Gets list of modules taken by user. ",
+        "description": "End point for getting list of modules taken by user. ",
+        "operationId": "active_mods",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "User credentials",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/jwtToken"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#/definitions/ActiveMods"
+            }
+          },
+          "405": {
+            "description": "Invalid input"
+          }
+        }
+      }
+    },
+    "/announcementsAll": {
+      "post": {
+        "tags": [
+          "Annoucements"
+        ],
+        "summary": "Gets list of modules taken by user. ",
+        "description": "End point for getting list of modules taken by user. ",
+        "operationId": "announcements_all",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "User credentials",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/jwtToken"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#/definitions/AnnouncementsAll"
+            }
+          },
+          "405": {
+            "description": "Invalid input"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Login": {
+      "type": "object",
+      "properties": {
+        "userName": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      },
+      "xml": {
+        "name": "Login"
+      }
+    },
+    "Auth": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "integer"
+        },
+        "data": {
+          "$ref": "#/definitions/jwtToken"
+        },
+        "status": {
+          "type": "boolean"
+        }
+      },
+      "xml": {
+        "name": "Auth"
+      }
+    },
+    "jwtToken": {
+      "type": "object",
+      "properties": {
+        "jwt": {
+          "type": "string"
+        }
+      },
+      "xml": {
+        "name": "jwtToken"
+      }
+    },
+    "Profile": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "integer"
+        },
+        "data": {
+          "$ref": "#/definitions/ProfileItems"
+        },
+        "status": {
+          "type": "boolean"
+        }
+      },
+      "xml": {
+        "name": "Profile"
+      }
+    },
+    "ProfileItems": {
+      "type": "object",
+      "properties": {
+        "mods": {
+          "$ref": "#/definitions/Mods"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "xml": {
+        "name": "ProfileItems"
+      }
+    },
+    "ActiveMods": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "integer"
+        },
+        "data": {
+          "$ref": "#/definitions/Mods"
+        },
+        "status": {
+          "type": "boolean"
+        }
+      },
+      "xml": {
+        "name": "ActiveMods"
+      }
+    },
+    "Mods": {
+      "type": "object",
+      "properties": {
+        "MODULE_NAME (Name acts as key)": {
+          "type": "object",
+          "properties": {
+            "class_grps": {
+              "type": "object",
+              "properties": {
+                "classNum": {
+                  "type": "string"
+                },
+                "id": {
+                  "type": "string"
+                }
+              }
+            },
+            "name": {
+              "type": "string"
+            },
+            "term": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "AnnouncementsAll": {
+      "type": "object",
+      "properties": {
+        "MODULE_NAME (Name acts as key)": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Announcement"
+          }
+        }
+      },
+      "xml": {
+        "name": "AnnouncementsAll"
+      }
+    },
+    "Announcement": {
+      "type": "object",
+      "properties": {
+        "datatime": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        }
+      },
+      "xml": {
+        "name": "Announcement"
+      }
+    },
+    "ApiResponse": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "type": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "externalDocs": {
+    "description": "GitHub",
+    "url": "https://github.com/w-yuchen/pyfluminus-server"
+  }
+}
