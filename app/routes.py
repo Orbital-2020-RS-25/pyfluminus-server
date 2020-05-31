@@ -1,6 +1,7 @@
 from pyfluminus.authorization import vafs_jwt
 from pyfluminus.api import name, modules, get_announcements
 from pyfluminus.structs import Module
+
 from flask import Flask, request, jsonify, redirect, url_for, render_template
 import sys
 from app import app, db, util
@@ -112,3 +113,9 @@ def profile(nusNetId):
                 "mods" : mod_info}), HTTP_OK
     except: 
         return util.response_json(False, 1, {"error" : "Not found"}), HTTP_NOT_FOUND
+
+@app.route('/modules/filesAll', methods=['POST'])
+def files_all(): 
+    auth = request.get_json()
+    files = util.get_mod_files(auth)
+    return util.response_json(True, len(files), files), HTTP_OK

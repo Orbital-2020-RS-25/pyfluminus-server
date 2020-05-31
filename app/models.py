@@ -43,8 +43,20 @@ class User_Mods(db.Model):
     mod_id = db.Column(db.String(64), index=True, unique=False)
     name = db.Column(db.String)
     class_grp = db.Column(db.JSON)
+    #files = db.Column(db.JSON) #tree structure
     term = db.Column(db.String(6), index=True, unique=False)
     student = db.Column(db.Integer, db.ForeignKey('users.id'))
     student_taking_mod = db.relationship('User', backref='mod_taken_by')
     def __repr__(self):
         return "<Mod {} taken by {}>".format(self.code, self.student)
+
+#class Mod_Files(db.Model): 
+#    __tablename__ = 'mod_files'
+#    id = db.Column(db.Integer, index=True, primary_key=True)
+#    mod_db_id = db.Column(db.Integer, db.ForeignKey('user_mods.id'))
+#    filename = db.Column(db.String, index=True, unique=False)
+#    file_path = db.Column(db.String, unique=True)
+#    mod_belonging_to = db.relationship('User_Mods', backref='contained_files')
+#    
+#    def __repr__(self): 
+#        return "<File {} with path {} under module {}>".format(self.filename, self.file_path, self.mod_belonging_to)

@@ -1,5 +1,7 @@
 from pyfluminus.api import name, modules, get_announcements, current_term
 from pyfluminus.structs import Module
+from pyfluminus.fluminus import get_links_for_module
+
 from app import db
 from app.models import User, User_Mods
 from app.extra_api import get_class_grps
@@ -82,3 +84,13 @@ def update_mods(auth, uId):
         db.session.delete(mod)
         db.session.commit()
     add_mods(auth, uId)
+
+def get_mod_files(auth): 
+    mods = modules(auth).data
+    files = []
+    for module in mods:
+        if module is None:
+            continue
+        data = get_links_for_module(auth, module)
+        files.append(data)
+    return files
