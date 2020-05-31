@@ -2,6 +2,10 @@
 
 Flask server to call APIs from [pyfluminus](https://github.com/raynoldng/pyfluminus). 
 
+Please refer to the [API documentation](https://app.swaggerhub.com/apis-docs/orbital-rs25/another-luminus/v3) for usage. 
+
+Currently hosted on Heroku. 
+
 To create database locally: 
 ```
 flask db migrate
