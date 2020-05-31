@@ -1,7 +1,7 @@
 from pyfluminus.authorization import vafs_jwt
 from pyfluminus.api import name, modules, get_announcements
 from pyfluminus.structs import Module
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, redirect, url_for
 import sys
 from app import app, db, util
 from app.models import User, User_Mods
@@ -36,16 +36,11 @@ def login():
     if User.query.filter_by(nus_net_id=user_id).first() == None: 
         uName = name(auth).data
         u = User(name = uName, nus_net_id = user_id)
-        mods = util.get_active_mods(auth)
+        #mods = util.get_active_mods(auth)
         db.session.add(u)
         db.session.commit()
         uId = User.query.filter_by(nus_net_id=user_id).first().id
-        for key in mods: 
-            mod_id = mods[key]["id"]
-            class_grp = get_class_grps(auth, mod_id)
-            m = User_Mods(code=key, mod_id=mod_id, name=mods[key]["name"], class_grp=class_grp, term=mods[key]["term"], student=uId)
-            db.session.add(m)
-            db.session.commit()
+        util.add_mods(auth, uId)
 
     return util.response_json(True, 1, auth), HTTP_OK
 
@@ -56,6 +51,33 @@ def userName():
         return util.response_json(True, 1, name(auth).data), HTTP_OK
     except: 
         return util.response_json(False, 1, {"error" : "Invalid"}), HTTP_NOT_FOUND
+
+@app.route('/updateProfile', methods=['POST'])
+def updateProfile(): 
+    login_info = request.get_json()
+    auth = vafs_jwt("nusstu\\" + login_info['userName'], login_info['password'])
+    user_id = login_info['userName']
+    if "error" in auth:
+        return util.response_json(False, 1, auth), HTTP_UNAUTHORISED
+
+    if User.query.filter_by(nus_net_id=user_id).first() != None:
+        uName = name(auth).data
+        db.update(User).where(User.nus_net_id==user_id).values(name=uName)
+        db.session.commit()
+    else: 
+        uName = name(auth).data
+        u = User(name = uName, nus_net_id = user_id)
+        db.session.add(u)
+        db.session.commit()
+    
+    if User.query.filter_by(nus_net_id=user_id).first().mods == []: 
+        uId = User.query.filter_by(nus_net_id=user_id).first().id
+        util.add_mods(auth, uId)
+    else: 
+        uId = User.query.filter_by(nus_net_id=user_id).first().id
+        util.update_mods(auth, uId)
+
+    return redirect(url_for('profile', nusNetId=user_id))
 
 @app.route('/activeModules', methods=['POST'])
 def active_mods():

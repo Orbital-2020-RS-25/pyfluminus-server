@@ -1,5 +1,8 @@
 from pyfluminus.api import name, modules, get_announcements, current_term
 from pyfluminus.structs import Module
+from app import db
+from app.models import User, User_Mods
+from app.extra_api import get_class_grps
 
 def get_active_mods(auth):
     """Gets all active mods taken by authenticated student. 
@@ -62,3 +65,20 @@ def response_json(status, count, data):
         "count" : count,
         "data"  : data
     }
+
+def add_mods(auth, uId): 
+    mods = get_active_mods(auth)
+    for key in mods: 
+        mod_id = mods[key]["id"]
+        class_grp = get_class_grps(auth, mod_id)
+        m = User_Mods(code=key, mod_id=mod_id, name=mods[key]["name"], class_grp=class_grp, term=mods[key]["term"], student=uId)
+        db.session.add(m)
+        db.session.commit()
+
+def update_mods(auth, uId): 
+    mods = get_active_mods(auth)
+    old_mods = User.query.get(uId).mods
+    for mod in old_mods: 
+        db.session.delete(mod)
+        db.session.commit()
+    add_mods(auth, uId)
