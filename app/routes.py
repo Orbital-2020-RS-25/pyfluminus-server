@@ -147,7 +147,7 @@ def aTest():
     return util.response_json(True, len(reply), reply), HTTP_OK
 
 @app.route('/modules/modFileTest', methods=['POST'])
-def aTest():
+def fTest():
     code = request.get_json().code
     reply = Mod_files.query.filter_by(code=code)
     return util.response_json(True, len(reply), reply), HTTP_OK
