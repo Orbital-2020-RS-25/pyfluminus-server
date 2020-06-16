@@ -50,6 +50,24 @@ class User_Mods(db.Model):
     def __repr__(self):
         return "<Mod {} taken by {}>".format(self.code, self.student)
 
+class Announcements(db.model): 
+    id = db.Column(db.Integer, index=True, primary_key=True)
+    code = db.Column(db.String)
+    contents = db.Column(db.JSON)
+    def __repr__(self): 
+        return "<Announcement {} under ()>".format(self.contents, self.code)
+
+class Mod_files(db.model):
+    id = db.Column(db.Integer, index=True, primary_key=True)
+    code = db.Column(db.String)
+    contents = db.Column(db.JSON)
+
+class Friends(db.model): 
+    id = db.Column(db.Integer, index=True, primary_key=True)
+    student = db.Column(db.String)
+    friend = db.Column(db.Integer)
+    def __repr__(self): 
+        return "<{} is a friend of {}>".format(self.friend, self, student)
 #class Mod_Files(db.Model): 
 #    __tablename__ = 'mod_files'
 #    id = db.Column(db.Integer, index=True, primary_key=True)

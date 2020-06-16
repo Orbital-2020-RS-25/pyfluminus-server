@@ -5,7 +5,7 @@ from pyfluminus.structs import Module
 from flask import Flask, request, jsonify, redirect, url_for, render_template
 import sys
 from app import app, db, util
-from app.models import User, User_Mods
+from app.models import User, User_Mods, Announcements, Mod_files
 from app.extra_api import get_class_grps
 
 HTTP_OK = 200
@@ -119,3 +119,23 @@ def files_all():
     auth = request.get_json()
     files = util.get_mod_files(auth)
     return util.response_json(True, len(files), files), HTTP_OK
+
+@app.route('/modules/files', methods=['POST'])
+def files():
+    auth = request.get_json().auth
+    code = request.get_json().code
+    files = util.get_single_mod_files(auth, code)
+    f = Mod_files(code=code, contents=files)
+    db.session.add(f)
+    db.session.commit()
+    return util.response_json(True, len(files), files), HTTP_OK
+
+@app.route('/modules/announcements', methods=['POST'])
+def announcements_single(): 
+    auth = request.get_json().auth
+    code = request.get_json().code
+    msgs = util.get_single_mod_announcements(auth, code)
+    m = Announcements(code=code, contents=msgs)
+    db.session.add(m)
+    db.session.commit()
+    return util.response_json(True, len(msgs), msgs), HTTP_OK

@@ -94,3 +94,15 @@ def get_mod_files(auth):
         data = get_links_for_module(auth, module)
         files.append(data)
     return files
+
+def get_single_mod_files(auth, code): 
+    mods = modules(auth).data
+    for mod in mods: 
+        if mod is None: 
+            continue
+        if mod.code == code: 
+            return get_links_for_module(auth, mod)
+    return None
+
+def get_single_mod_announcements(auth, mod_id):
+    return get_announcements(auth, mod_id, False).data
