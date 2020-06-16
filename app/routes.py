@@ -139,3 +139,15 @@ def announcements_single():
     db.session.add(m)
     db.session.commit()
     return util.response_json(True, len(msgs), msgs), HTTP_OK
+
+@app.route('/modules/announcementsTest', methods=['POST'])
+def aTest():
+    code = request.get_json().code
+    reply = Announcements.query.filter_by(code=code)
+    return util.response_json(True, len(reply), reply), HTTP_OK
+
+@app.route('/modules/modFileTest', methods=['POST'])
+def aTest():
+    code = request.get_json().code
+    reply = Mod_files.query.filter_by(code=code)
+    return util.response_json(True, len(reply), reply), HTTP_OK
