@@ -7,6 +7,7 @@ import sys
 from app import app, db, util
 from app.models import User, User_Mods, Announcements, Mod_files
 from app.extra_api import get_class_grps
+import json
 
 HTTP_OK = 200
 HTTP_NO_CONTENT = 204
@@ -122,9 +123,9 @@ def files_all():
 
 @app.route('/modules/files', methods=['POST'])
 def files():
-    auth = request.get_json().auth
-    code = request.get_json().code
-    files = util.get_single_mod_files(auth, code)
+    auth = request.get_json()['auth']
+    code = request.get_json()['code']
+    files = json.dumps(util.get_single_mod_files(auth, code))
     f = Mod_files(code=code, contents=files)
     db.session.add(f)
     db.session.commit()
@@ -132,9 +133,12 @@ def files():
 
 @app.route('/modules/announcements', methods=['POST'])
 def announcements_single(): 
-    auth = request.get_json().auth
-    code = request.get_json().code
-    msgs = util.get_single_mod_announcements(auth, code)
+    auth = request.get_json()['auth']
+    code = request.get_json()['code']
+    mod_id = User_Mods.query.filter_by(code=code).first().mod_id
+    msgs = util.get_single_mod_announcements(auth, mod_id)
+    #msgs = json.dumps(msgs)
+    #print(type(msgs) + "hihi")
     m = Announcements(code=code, contents=msgs)
     db.session.add(m)
     db.session.commit()
@@ -142,12 +146,12 @@ def announcements_single():
 
 @app.route('/modules/announcementsTest', methods=['POST'])
 def aTest():
-    code = request.get_json().code
-    reply = Announcements.query.filter_by(code=code)
+    code = request.get_json()['code']
+    reply = Announcements.query.filter_by(code=code).first().contents
     return util.response_json(True, len(reply), reply), HTTP_OK
 
 @app.route('/modules/modFileTest', methods=['POST'])
 def fTest():
-    code = request.get_json().code
-    reply = Mod_files.query.filter_by(code=code)
+    code = request.get_json()['code']
+    reply = Mod_files.query.filter_by(code=code).first().contents
     return util.response_json(True, len(reply), reply), HTTP_OK

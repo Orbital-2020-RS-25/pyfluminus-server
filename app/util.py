@@ -5,6 +5,7 @@ from pyfluminus.fluminus import get_links_for_module
 from app import db
 from app.models import User, User_Mods
 from app.extra_api import get_class_grps
+from datetime import datetime
 
 def get_active_mods(auth):
     """Gets all active mods taken by authenticated student. 
@@ -105,4 +106,7 @@ def get_single_mod_files(auth, code):
     return None
 
 def get_single_mod_announcements(auth, mod_id):
-    return get_announcements(auth, mod_id, False).data
+    msgs = get_announcements(auth, mod_id, False).data
+    for msg in msgs: 
+        msg['datetime'] = msg['datetime'].strftime("%a, %d %b %Y, %H:%M:%S")
+    return msgs
