@@ -137,8 +137,6 @@ def announcements_single():
     code = request.get_json()['code']
     mod_id = User_Mods.query.filter_by(code=code).first().mod_id
     msgs = util.get_single_mod_announcements(auth, mod_id)
-    #msgs = json.dumps(msgs)
-    #print(type(msgs) + "hihi")
     m = Announcements(code=code, contents=msgs)
     db.session.add(m)
     db.session.commit()

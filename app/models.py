@@ -17,6 +17,19 @@ class User(db.Model):
     nus_net_id = db.Column(db.String, index=True, unique=True)
     mods = db.relationship('User_Mods', backref='student_taking')
 
+    def add_friend(self, user_to_be_added):
+        try: 
+            user_id = User.query.filter_by(nus_net_id=user_to_be_added).first().id
+        except: 
+            raise ValueError("User not found")
+        if Friends.query.filter_by(student=self.nus_net_id).filter_by(friend=user_to_be_added).first() != None: 
+            new_friend = Friends(student=self.nus_net_id, friend=user_to_be_added)
+            db.session.add(new_friend)
+            db.commit()
+            return True
+        else: 
+            return False
+
     def __repr__(self):
         return "<User {}, {}, {}>".format(self.name, self.nus_net_id, self.id)
 
