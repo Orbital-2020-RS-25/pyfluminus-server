@@ -15,6 +15,7 @@ class User(db.Model):
     name = db.Column(db.String(64), index=True, unique=False)
     #NUSNET ID, the EXXXXXXX number
     nus_net_id = db.Column(db.String, index=True, unique=True)
+    free_time = db.Column(db.JSON)
     mods = db.relationship('User_Mods', backref='student_taking')
 
     def add_friend(self, user_to_be_added):
@@ -30,6 +31,9 @@ class User(db.Model):
         else: 
             return False
 
+    def set_free_time(self): 
+        time_slots = []
+        
     def __repr__(self):
         return "<User {}, {}, {}>".format(self.name, self.nus_net_id, self.id)
 
