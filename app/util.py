@@ -75,7 +75,8 @@ def add_mods(auth, uId):
         mod_id = mods[key]["id"]
         class_grp = get_class_grps(auth, mod_id)
         print(class_grp)
-        m = User_Mods(code=key, mod_id=mod_id, name=mods[key]["name"], class_grp=class_grp, term=mods[key]["term"], student=uId)
+        m = User_Mods(code=key, mod_id=mod_id, name=mods[key]["name"], class_grp=class_grp, term=mods[key]["term"], sem=2, student=uId)
+        m.get_timings()
         db.session.add(m)
         db.session.commit()
 
