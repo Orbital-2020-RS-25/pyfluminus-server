@@ -1,5 +1,5 @@
 from app import db
-from extra_api import get_timetable
+from app.extra_api import get_timetable
 
 class User(db.Model):
     """Database table for a user. Implemented with flask-SQLalchemy. 
