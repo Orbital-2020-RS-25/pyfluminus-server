@@ -81,12 +81,14 @@ class User_Mods(db.Model):
                 lesson = "Sectional Teaching"
 
             grp['lessonType'] = lesson
+            grp['timing'] = []
+
         if timetable != None: 
             for timing in timetable: 
                 for grp in self.class_grp: 
                     if grp['lessonType'] == timing['lessonType'] and grp['classNum'][1:] == timing['classNo']: 
-                        grp['timing'] = timing
-                                
+                        grp['timing'].append(timing)
+                        break
         return self
 
     def __repr__(self):
