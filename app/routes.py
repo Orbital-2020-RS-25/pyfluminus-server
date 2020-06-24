@@ -24,10 +24,18 @@ def index():
 def hello():
     return 'Hello, World!'
 
+@app.route('/get_class_grps', methods=['POST'])
+def f(): 
+    mod_id = request.get_json()['mod_id']
+    auth = request.get_json()['auth']
+    return get_class_grps(auth, mod_id)
+
 # receives login info and returns auth token, login info must be sent as application/json
 @app.route('/login', methods=['POST'])
 def login():
     login_info = request.get_json()
+
+    print(login_info['userName']+'\n')
     
     if login_info['userName'] == 'test': 
         auth = {'jwt' : 'test'}

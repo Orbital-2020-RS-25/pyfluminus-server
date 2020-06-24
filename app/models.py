@@ -1,4 +1,5 @@
 from app import db
+from extra_api import get_timetable
 
 class User(db.Model):
     """Database table for a user. Implemented with flask-SQLalchemy. 
@@ -62,8 +63,33 @@ class User_Mods(db.Model):
     class_grp = db.Column(db.JSON)
     #files = db.Column(db.JSON) #tree structure
     term = db.Column(db.String(6), index=True, unique=False)
+    sem = db.Column(db.Integer)
     student = db.Column(db.Integer, db.ForeignKey('users.id'))
     student_taking_mod = db.relationship('User', backref='mod_taken_by')
+
+    def get_timings(self): 
+        timetable = get_timetable(self.code, self.term, self.sem)
+        for grp in self.class_grp: 
+            letter = grp['classNum'][0]
+            if letter == 'L': 
+                lesson = 'Lecture'
+            elif letter == 'B': 
+                lesson = "Laboratory"
+            elif letter == 'T': 
+                lesson == 'Tutorial'
+            else: 
+                lesson == "Sectional Teaching"
+
+            grp['lessonType'] = lesson
+    
+        for timing in timetable: 
+            for grp in self.class_grp: 
+                if grp['lessonType'] == timing['lessonType'] and grp['classNum'][1:] == timing['classNo']: 
+                    grp['timing'] = timing
+                    break
+        
+        return self
+
     def __repr__(self):
         return "<Mod {} taken by {}>".format(self.code, self.student)
 
