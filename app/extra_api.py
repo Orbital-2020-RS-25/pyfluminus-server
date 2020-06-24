@@ -19,13 +19,14 @@ def get_class_grps(auth, mod_id):
     return class_grps
 
 def get_timetable(code, term, sem): 
-    term = "20{}-20{}".format(term[0:1], term[2:3])
+    term = "20{}-20{}".format(term[:2], term[2:])
+    #print(term)
     url = "https://api.nusmods.com/v2/{}/modules/{}.json".format(term, code)
 
     payload  = {}
     headers = {}
     response = requests.request("GET", url, headers=headers, data = payload)
-
+    #print(response)
     if response.status_code == 404: 
         return None
     else: 
