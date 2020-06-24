@@ -76,9 +76,9 @@ class User_Mods(db.Model):
             elif letter == 'B': 
                 lesson = "Laboratory"
             elif letter == 'T': 
-                lesson == 'Tutorial'
+                lesson = 'Tutorial'
             else: 
-                lesson == "Sectional Teaching"
+                lesson = "Sectional Teaching"
 
             grp['lessonType'] = lesson
     
