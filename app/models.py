@@ -86,8 +86,7 @@ class User_Mods(db.Model):
                 for grp in self.class_grp: 
                     if grp['lessonType'] == timing['lessonType'] and grp['classNum'][1:] == timing['classNo']: 
                         grp['timing'] = timing
-                        break
-        
+                                
         return self
 
     def __repr__(self):
