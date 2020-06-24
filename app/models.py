@@ -81,12 +81,12 @@ class User_Mods(db.Model):
                 lesson = "Sectional Teaching"
 
             grp['lessonType'] = lesson
-    
-        for timing in timetable: 
-            for grp in self.class_grp: 
-                if grp['lessonType'] == timing['lessonType'] and grp['classNum'][1:] == timing['classNo']: 
-                    grp['timing'] = timing
-                    break
+        if timing != None: 
+            for timing in timetable: 
+                for grp in self.class_grp: 
+                    if grp['lessonType'] == timing['lessonType'] and grp['classNum'][1:] == timing['classNo']: 
+                        grp['timing'] = timing
+                        break
         
         return self
 
