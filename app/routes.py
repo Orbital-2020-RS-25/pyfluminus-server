@@ -9,6 +9,8 @@ from app.models import User, User_Mods, Announcements, Mod_files
 from app.extra_api import get_class_grps
 import json
 
+from sqlalchemy.orm.attributes import flag_modified
+
 HTTP_OK = 200
 HTTP_NO_CONTENT = 204
 HTTP_BAD_REQUEST = 400
@@ -55,6 +57,10 @@ def login():
         db.session.commit()
         uId = User.query.filter_by(nus_net_id=user_id).first().id
         util.add_mods(auth, uId)
+        u = User.query.get(uId)
+        u.get_busy_time()
+        flag_modified(u, "timetable")
+        db.session.commit()
 
     return util.response_json(True, 1, auth), HTTP_OK
 
@@ -91,6 +97,10 @@ def updateProfile():
         uId = User.query.filter_by(nus_net_id=user_id).first().id
         util.update_mods(auth, uId)
 
+    u = User.query.filter_by(nus_net_id=user_id).first()
+    u.get_busy_time()
+    flag_modified(u, "timetable")
+    db.session.commit()
     return redirect(url_for('profile', nusNetId=user_id))
 
 @app.route('/activeModules', methods=['POST'])
@@ -121,10 +131,11 @@ def profile(nusNetId):
         for mod in mods:
             mod_info[mod.code] = {"id" : mod.mod_id,
                                 "name" : mod.name,
-                                "term" : mod.term, 
-                                "class_grps" : mod.class_grp}
-        return util.response_json(True, len(mods), {"name" : user.name, 
-                "mods" : mod_info}), HTTP_OK
+                                "term" : mod.term}
+        return util.response_json(True, len(mods), {
+            "name" : user.name, 
+            "mods" : mod_info, 
+            "timetable" : user.timetable}), HTTP_OK
     except: 
         return util.response_json(False, 1, {"error" : "Not found"}), HTTP_NOT_FOUND
 

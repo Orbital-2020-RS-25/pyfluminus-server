@@ -1,6 +1,32 @@
 from app import db
 from app.extra_api import get_timetable
 
+from datetime import datetime  
+from datetime import timedelta  
+
+def get_dates(week, day_of_week, start, end):
+    sem_start = datetime(year=2020, month=1, day=13, hour=0, minute=0, second=0) 
+    day = {
+        "Monday": 0,
+        "Tuesday": 1, 
+        "Wednesday": 2, 
+        "Thursday": 3, 
+        "Friday": 4, 
+        "Saturday": 5, 
+        "Sunday": 6
+    }
+    if week < 7: 
+        week = week - 1 #offset recess week after week 6
+
+    days_to_add = float(7 * week + day[day_of_week])
+    start_time = sem_start + timedelta(days=days_to_add, hours=float(start[0:2]), minutes=float(start[2:3]))
+    end_time = sem_start + timedelta(days=days_to_add, hours=float(end[0:2]), minutes=float(end[2:]))
+    date_of_lesson = start_time.date()
+    def makeStr(time): 
+        return time.strftime("%Y-%m-%dT%H:%M:%S")
+
+    return (makeStr(start_time), makeStr(end_time), date_of_lesson.strftime("%Y-%m-%d"))
+
 class User(db.Model):
     """Database table for a user. Implemented with flask-SQLalchemy. 
 
@@ -16,7 +42,7 @@ class User(db.Model):
     name = db.Column(db.String(64), index=True, unique=False)
     #NUSNET ID, the EXXXXXXX number
     nus_net_id = db.Column(db.String, index=True, unique=True)
-    free_time = db.Column(db.JSON)
+    timetable = db.Column(db.JSON)
     mods = db.relationship('User_Mods', backref='student_taking')
 
     def add_friend(self, user_to_be_added):
@@ -31,9 +57,43 @@ class User(db.Model):
             return True
         else: 
             return False
+    
+    def get_busy_time(self): 
+        time_slots = {}
+        mods = User_Mods.query.filter_by(student=self.id).all()
+        for mod in mods:
+            #mods are keys 
+            code = mod.code
+            mod_name = mod.name
+            classes = mod.class_grp #array
+            for lesson in classes: 
+                print(lesson)
+                lesson_timing = lesson['timing'][0]
+                day = lesson_timing['day']
+                start = lesson_timing['startTime']
+                end = lesson_timing['endTime']
+                lesson_type = lesson['lessonType']
+                venue = lesson_timing['venue']
+                weeks = lesson_timing['weeks']
+                for week in weeks: 
+                    timing = get_dates(week, day, start, end)
+                    calendar_item = {
+                        'start': timing[0], 
+                        'end': timing[1], 
+                        'name': {
+                            'code': code, 
+                            'lessonType': lesson_type, 
+                            'venue': venue, 
+                            'name': mod_name
+                        }
+                    }
+                    if timing[2] in time_slots: 
+                        time_slots[timing[2]].append(calendar_item)
+                    else: 
+                        time_slots[timing[2]] = [calendar_item]
+        self.timetable = time_slots
 
-    def set_free_time(self): 
-        time_slots = []
+            
         
     def __repr__(self):
         return "<User {}, {}, {}>".format(self.name, self.nus_net_id, self.id)
