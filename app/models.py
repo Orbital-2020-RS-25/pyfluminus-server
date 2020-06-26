@@ -70,7 +70,10 @@ class User(db.Model):
                 #print(lesson)
                 if not lesson: 
                     break
-                lesson_timing = lesson['timing'][0]
+                lesson_timing = lesson['timing']
+                if not lesson_timing: 
+                    break
+                lesson_timing = lesson_timing[0]
                 day = lesson_timing['day']
                 start = lesson_timing['startTime']
                 end = lesson_timing['endTime']
