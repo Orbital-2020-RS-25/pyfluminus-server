@@ -2,15 +2,15 @@ from app import app, db, models
 from sqlalchemy.orm.attributes import flag_modified
 
 def patch_users_and_mods(): 
-    #mods = models.User_Mods.query.all()
-    #for mod in mods: 
-    #    mod.sem = 2
-    #    flag_modified(mod, "sem")
-    #    print(mod.sem)
-    #    mod.get_timings()
-    #    print(mod.class_grp)
-    #    flag_modified(mod, "class_grp")
-    #    db.session.commit()
+    mods = models.User_Mods.query.all()
+    for mod in mods: 
+        mod.sem = 2
+        flag_modified(mod, "sem")
+        print(mod.sem)
+        mod.get_timings()
+        print(mod.class_grp)
+        flag_modified(mod, "class_grp")
+        db.session.commit()
 
     users = models.User.query.all()
     for u in users: 
