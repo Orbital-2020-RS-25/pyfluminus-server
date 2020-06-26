@@ -67,7 +67,9 @@ class User(db.Model):
             mod_name = mod.name
             classes = mod.class_grp #array
             for lesson in classes: 
-                print(lesson)
+                #print(lesson)
+                if not lesson: 
+                    break
                 lesson_timing = lesson['timing'][0]
                 day = lesson_timing['day']
                 start = lesson_timing['startTime']
