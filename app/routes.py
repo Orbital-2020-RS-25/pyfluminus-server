@@ -43,11 +43,11 @@ def login():
         auth = {'jwt' : 'test'}
         return util.response_json(True, 1, auth), HTTP_OK
 
-    auth = vafs_jwt("nusstu\\" + login_info['userName'], login_info['password'])
+    auth = vafs_jwt("nusstu\\" + login_info['userName'].upper(), login_info['password'])
     if "error" in auth:
         return util.response_json(False, 1, auth), HTTP_UNAUTHORISED
         
-    user_id = login_info['userName']
+    user_id = login_info['userName'].upper()
 
     if User.query.filter_by(nus_net_id=user_id).first() == None: 
         uName = name(auth).data
@@ -76,7 +76,7 @@ def userName():
 def updateProfile(): 
     login_info = request.get_json()
     auth = vafs_jwt("nusstu\\" + login_info['userName'], login_info['password'])
-    user_id = login_info['userName']
+    user_id = login_info['userName'].upper()
     if "error" in auth:
         return util.response_json(False, 1, auth), HTTP_UNAUTHORISED
 
@@ -168,12 +168,27 @@ def announcements_single():
 
 @app.route('/modules/announcementsTest', methods=['POST'])
 def aTest():
+    #code = request.get_json()['code']
+    #reply = Announcements.query.filter_by(code=code).first().contents
+    #return util.response_json(True, len(reply), reply), HTTP_OK
+    auth = request.get_json()['auth']
     code = request.get_json()['code']
-    reply = Announcements.query.filter_by(code=code).first().contents
-    return util.response_json(True, len(reply), reply), HTTP_OK
+    mod_id = User_Mods.query.filter_by(code=code).first().mod_id
+    msgs = util.get_single_mod_announcements(auth, mod_id)
+    m = Announcements(code=code, contents=msgs)
+    db.session.add(m)
+    db.session.commit()
+    return util.response_json(True, len(msgs), msgs), HTTP_OK
 
 @app.route('/modules/modFileTest', methods=['POST'])
 def fTest():
+    #code = request.get_json()['code']
+    #reply = Mod_files.query.filter_by(code=code).first().contents
+    #return util.response_json(True, len(reply), reply), HTTP_OK
+    auth = request.get_json()['auth']
     code = request.get_json()['code']
-    reply = Mod_files.query.filter_by(code=code).first().contents
-    return util.response_json(True, len(reply), reply), HTTP_OK
+    files = json.dumps(util.get_single_mod_files(auth, code))
+    f = Mod_files(code=code, contents=files)
+    db.session.add(f)
+    db.session.commit()
+    return util.response_json(True, len(files), files), HTTP_OK 
